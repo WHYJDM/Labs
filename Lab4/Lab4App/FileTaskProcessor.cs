@@ -2,116 +2,58 @@ using System.Text.Json;
 
 namespace Lab4App;
 
+/// <summary>
+/// Processes file tasks for watches data, including writing, reading, and combining files asynchronously.
+/// </summary>
 public class FileTaskProcessor
 {
-    private static readonly SemaphoreSlim fileSemaphore = new(1, 1);
-    private readonly List<Watches> watches;
+    private const int WatchesPerFile = 10;
+    private const string File1Name = "file1.json";
+    private const string File2Name = "file2.json";
+    private const string File3Name = "file3.json";
 
+    private readonly List<Watches> watches;
+    private readonly FileOperations fileOperations;
+
+    /// <summary>
+    /// Initializes a new instance of the FileTaskProcessor class.
+    /// </summary>
     public FileTaskProcessor()
     {
-        watches = GenerateWatches();
+        var generator = new WatchesDataGenerator();
+        watches = generator.GenerateWatches();
+        fileOperations = new FileOperations();
     }
 
-    private List<Watches> GenerateWatches()
-    {
-        var list = new List<Watches>();
-        for (int i = 1; i <= 20; i++)
-        {
-            var type = (WatchesType)((i - 1) % 3);
-            list.Add(Watches.Create(i, $"Model{i}", $"SN{i}", type));
-        }
-        return list;
-    }
-
+    /// <summary>
+    /// Executes Task 1: Writes the first half of watches to file1.json and the second half to file2.json concurrently.
+    /// </summary>
     public void Task1()
     {
-        var task1 = Task.Run(() => WriteToFile(watches.Take(10), "file1.json"));
-        var task2 = Task.Run(() => WriteToFile(watches.Skip(10), "file2.json"));
+        var task1 = Task.Run(() => fileOperations.WriteToFile(watches.Take(WatchesPerFile), File1Name));
+        var task2 = Task.Run(() => fileOperations.WriteToFile(watches.Skip(WatchesPerFile), File2Name));
         Task.WaitAll(task1, task2);
     }
 
-    private void WriteToFile(IEnumerable<Watches> items, string fileName)
-    {
-        fileSemaphore.Wait();
-        try
-        {
-            using var writer = new StreamWriter(fileName);
-            foreach (var watch in items)
-            {
-                writer.WriteLine(watch.ToJson());
-            }
-        }
-        finally
-        {
-            fileSemaphore.Release();
-        }
-    }
-
+    /// <summary>
+    /// Executes Task 2: Reads data from file1.json and file2.json concurrently, then combines and writes to file3.json.
+    /// </summary>
     public void Task2()
     {
-        var readTask1 = Task.Run(() => ReadFromFile("file1.json"));
-        var readTask2 = Task.Run(() => ReadFromFile("file2.json"));
+        var readTask1 = Task.Run(() => fileOperations.ReadFromFile(File1Name));
+        var readTask2 = Task.Run(() => fileOperations.ReadFromFile(File2Name));
         Task.WaitAll(readTask1, readTask2);
         var data1 = readTask1.Result;
         var data2 = readTask2.Result;
-        WriteCombinedToFile(data1.Concat(data2), "file3.json");
+        fileOperations.WriteToFile(data1.Concat(data2), File3Name);
     }
 
-    private List<Watches> ReadFromFile(string fileName)
-    {
-        fileSemaphore.Wait();
-        try
-        {
-            var list = new List<Watches>();
-            using var reader = new StreamReader(fileName);
-            string? line;
-            while ((line = reader.ReadLine()) is not null)
-            {
-                list.Add(Watches.FromJson(line));
-            }
-            return list;
-        }
-        finally
-        {
-            fileSemaphore.Release();
-        }
-    }
-
-    private void WriteCombinedToFile(IEnumerable<Watches> items, string fileName)
-    {
-        fileSemaphore.Wait();
-        try
-        {
-            using var writer = new StreamWriter(fileName);
-            foreach (var watch in items)
-            {
-                writer.WriteLine(watch.ToJson());
-            }
-        }
-        finally
-        {
-            fileSemaphore.Release();
-        }
-    }
-
+    /// <summary>
+    /// Executes Task 3: Asynchronously reads from file3.json and prints each watch's JSON representation concurrently.
+    /// </summary>
+    /// <returns>A Task representing the asynchronous operation.</returns>
     public async Task Task3()
     {
-        await fileSemaphore.WaitAsync();
-        try
-        {
-            var tasks = new List<Task>();
-            using var reader = new StreamReader("file3.json");
-            string? line;
-            while ((line = await reader.ReadLineAsync()) is not null)
-            {
-                var watch = Watches.FromJson(line);
-                tasks.Add(Task.Run(() => Console.WriteLine(watch.ToJson())));
-            }
-            await Task.WhenAll(tasks);
-        }
-        finally
-        {
-            fileSemaphore.Release();
-        }
+        await fileOperations.PrintFromFileAsync(File3Name);
     }
 }

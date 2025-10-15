@@ -2,153 +2,62 @@ using System.Diagnostics;
 
 namespace Lab3App;
 
+/// <summary>
+/// Main processor class that orchestrates file operations and watch processing tasks.
+/// </summary>
 public class FileProcessor
 {
-    private readonly object _lock = new();
-
+    /// <summary>
+    /// Executes Task 1: Splits watches and writes to files.
+    /// </summary>
+    /// <param name="watches">The list of watches.</param>
     public void Task1(List<Watches> watches)
     {
-        var first10 = watches.Take(10).ToList();
-        var second10 = watches.Skip(10).ToList();
-
-        Thread thread1 = new(() => WriteToFile(first10, "file1.json"));
-        Thread thread2 = new(() => WriteToFile(second10, "file2.json"));
-
-        thread1.Start();
-        thread2.Start();
-
-        thread1.Join();
-        thread2.Join();
+        FileSplitter splitter = new();
+        splitter.SplitAndWrite(watches);
     }
 
-    private void WriteToFile(List<Watches> watches, string fileName)
-    {
-        lock (_lock)
-        {
-            using StreamWriter writer = new(fileName);
-            foreach (var watch in watches)
-            {
-                writer.WriteLine(watch.ToJson());
-            }
-        }
-    }
-
+    /// <summary>
+    /// Executes Task 2: Merges two files into one.
+    /// </summary>
     public void Task2()
     {
-        List<string> lines1 = new();
-        List<string> lines2 = new();
-
-        Thread thread1 = new(() =>
-        {
-            lock (_lock)
-            {
-                lines1 = File.ReadAllLines("file1.json").ToList();
-            }
-        });
-        Thread thread2 = new(() =>
-        {
-            lock (_lock)
-            {
-                lines2 = File.ReadAllLines("file2.json").ToList();
-            }
-        });
-
-        thread1.Start();
-        thread2.Start();
-
-        thread1.Join();
-        thread2.Join();
-
-        using StreamWriter writer = new("file3.json");
-        for (int i = 0; i < 10; i++)
-        {
-            writer.WriteLine(lines1[i]);
-            writer.WriteLine(lines2[i]);
-        }
+        FileMerger merger = new();
+        merger.MergeFiles();
     }
 
+    /// <summary>
+    /// Executes Task 3.1: Processes watches sequentially and measures time.
+    /// </summary>
     public void Task3_1()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        var lines = File.ReadAllLines("file3.json");
-        foreach (var line in lines)
-        {
-            var watch = Watches.FromJson(line);
-            watch.PrintObject();
-        }
+        WatchProcessor processor = new SequentialProcessor();
+        processor.ProcessAndPrint();
         stopwatch.Stop();
         Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} ms");
     }
 
+    /// <summary>
+    /// Executes Task 3.2: Processes watches in parallel and measures time.
+    /// </summary>
     public void Task3_2()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        var lines = File.ReadAllLines("file3.json");
-        var half = lines.Length / 2;
-        var firstHalf = lines.Take(half).ToList();
-        var secondHalf = lines.Skip(half).ToList();
-
-        Thread thread1 = new(() =>
-        {
-            foreach (var line in firstHalf)
-            {
-                var watch = Watches.FromJson(line);
-                watch.PrintObject();
-            }
-        });
-        Thread thread2 = new(() =>
-        {
-            foreach (var line in secondHalf)
-            {
-                var watch = Watches.FromJson(line);
-                watch.PrintObject();
-            }
-        });
-
-        thread1.Start();
-        thread2.Start();
-
-        thread1.Join();
-        thread2.Join();
-
+        WatchProcessor processor = new ParallelProcessor();
+        processor.ProcessAndPrint();
         stopwatch.Stop();
         Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} ms");
     }
 
+    /// <summary>
+    /// Executes Task 3.3: Processes watches with semaphore-controlled threads and measures time.
+    /// </summary>
     public void Task3_3()
     {
-        Semaphore semaphore = new(5, 5);
-        List<Thread> threads = new();
         Stopwatch stopwatch = Stopwatch.StartNew();
-
-        for (int i = 0; i < 10; i++)
-        {
-            Thread thread = new(() =>
-            {
-                semaphore.WaitOne();
-                try
-                {
-                    var lines = File.ReadAllLines("file3.json");
-                    foreach (var line in lines)
-                    {
-                        var watch = Watches.FromJson(line);
-                        watch.PrintObject();
-                    }
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            });
-            threads.Add(thread);
-            thread.Start();
-        }
-
-        foreach (var thread in threads)
-        {
-            thread.Join();
-        }
-
+        WatchProcessor processor = new SemaphoreProcessor();
+        processor.ProcessAndPrint();
         stopwatch.Stop();
         Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} ms");
     }
