@@ -1,3 +1,6 @@
+// тут сер/десер в XML поиск и изменение атрибутов через XD и XmlD
+
+
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -8,7 +11,7 @@ using Lab2Library;
 /// </summary>
 public class XmlHandler
 {
-    private readonly XmlSerializer _serializer;
+    private readonly XmlSerializer _serializer; // поля классов _с этой штучкой в начале 
 
     public XmlHandler()
     {
@@ -22,8 +25,8 @@ public class XmlHandler
     {
         try
         {
-            using var writer = new StreamWriter(fileName);
-            _serializer.Serialize(writer, watches);
+            using var writer = new StreamWriter(fileName); // StreamWriter умеет записывать текст в файл
+            _serializer.Serialize(writer, watches);                     // список превращается в xml
             Console.WriteLine("Serialized to " + fileName);
         }
         catch
@@ -42,7 +45,7 @@ public class XmlHandler
             Console.WriteLine("File does not exist.");
             return;
         }
-        Console.WriteLine(File.ReadAllText(fileName));
+        Console.WriteLine(File.ReadAllText(fileName));            // читает весь текст возвращет как строку (вывод на экран то что в XML)
     }
 
     /// <summary>
@@ -57,7 +60,7 @@ public class XmlHandler
         }
         try
         {
-            using var reader = new StreamReader(fileName);
+            using var reader = new StreamReader(fileName);   // умеет читать текст из файла
             var deserialized = (List<Watches>)_serializer.Deserialize(reader);
             PrintWatches(deserialized);
         }
@@ -80,9 +83,9 @@ public class XmlHandler
         try
         {
             var doc = XDocument.Load(fileName);
-            var models = doc.Descendants("Watches")
-                .Attributes("Model")
-                .Select(a => a.Value);
+            var models = doc.Descendants("Watches")  // ищет все теги watches   
+                .Attributes("Model")     // берет атрибут model из каждого тега 
+                .Select(a => a.Value);   // делает Model1 Model2 в итоге models это список всех моделей из XML
             Console.WriteLine("Models: " + string.Join(", ", models) + ",");
         }
         catch
@@ -105,11 +108,11 @@ public class XmlHandler
         {
             var doc = new XmlDocument();
             doc.Load(fileName);
-            var nodes = doc.SelectNodes("//Watches/@Model");
+            var nodes = doc.SelectNodes("//Watches/@Model");                // nodes список всех атрибутов Model в документе
             Console.Write("Models: ");
             foreach (XmlAttribute attr in nodes)
             {
-                Console.Write(attr.Value + ", ");
+                Console.Write(attr.Value + ", ");                           // attr.Value значение атрибута (Model1)
             }
             Console.WriteLine();
         }

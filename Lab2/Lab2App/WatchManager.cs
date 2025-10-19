@@ -1,3 +1,6 @@
+// это чисто дл€ создани€ 10 экземпл€ров часов, а еще выводит их
+
+
 using Lab2Library;
 
 /// <summary>
@@ -12,12 +15,12 @@ public class WatchManager
     /// <summary>
     /// Creates a list of watches with sample data.
     /// </summary>
-    public List<Watches> CreateWatches()
+    public List<Watches> CreateWatches()                          // метод который просто создает список часов 
     {
         var watches = new List<Watches>();
         for (var i = 1; i <= NumberOfWatches; i++)
         {
-            watches.Add(Watches.Create(
+            watches.Add(Watches.Create(                           // добавл€ет новый объект Watches в список. дальше вызывает create, чтобы сделать новые часы
                 i,
                 $"Model{i}",
                 $"SN{i}",

@@ -2,7 +2,7 @@ using Lab3App;
 
 // Program entry point for Lab3 application
 // Generates a list of watches and executes file processing tasks
-List<Watches> watches = new();
+List<Watches> watches = new(); // динамический массив объектов класса, можно расширять и сжимать кол-во эл
 Random random = new();
 
 for (int i = 0; i < Constants.NumberOfWatches; i++)

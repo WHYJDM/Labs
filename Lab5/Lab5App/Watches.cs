@@ -1,10 +1,13 @@
 using System.Text.Json;
 
-namespace Lab4App;
+namespace Lab5App;
 
+/// <summary>
+/// Represents a watch with its properties.
+/// </summary>
 public class Watches
 {
-    public required int Id { get; set; } // required для того что бы нельзя было создать обьект не заполнив свойство
+    public required int Id { get; set; }
 
     public required string Model { get; set; }
 
