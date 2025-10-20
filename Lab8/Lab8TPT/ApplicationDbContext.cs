@@ -1,6 +1,3 @@
-///// по таблице на тип.// каждый класс в своей табл но наследники свзвны c основной табл по id 
-
-
 using Microsoft.EntityFrameworkCore;
 using Lab8Models;
 

@@ -5,7 +5,7 @@ namespace Lab3App;
 /// </summary>
 public class FileSplitter
 {
-    private readonly object _lock = new(); // гаринтия что только 1 поток сможет выполнить код на определенном отрезке времени
+    private readonly object _lock = new();
 
     /// <summary>
     /// Splits the watches list into two halves and writes each to a separate file concurrently.
@@ -19,7 +19,7 @@ public class FileSplitter
         Thread thread1 = new(() => WriteToFile(first10, Constants.File1));
         Thread thread2 = new(() => WriteToFile(second10, Constants.File2));
 
-        thread1.Start(); // параллельное выполнение
+        thread1.Start();
         thread2.Start();
 
         thread1.Join();
@@ -35,10 +35,10 @@ public class FileSplitter
     {
         lock (_lock) // защита процесса записи
         {
-            using StreamWriter writer = new(fileName); //  StreamWriter открывает поток для записи в текстовый файл| Using гарантирует, что файл будет закрыт и освобождён после завершения
+            using StreamWriter writer = new(fileName);
             foreach (var watch in watches)
             {
-                writer.WriteLine(watch.ToJson()); // ну тут просто в json
+                writer.WriteLine(watch.ToJson());
             }
         }
     }

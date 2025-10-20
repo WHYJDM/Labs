@@ -1,6 +1,6 @@
 using Lab2Library;
 
-// Constants
+
 const string FileName = "watches.xml";
 
 var watchManager = new WatchManager();

@@ -1,7 +1,3 @@
-///// по таблице на каждвй класс базовой таблы нет вообще
-
-
-
 using Microsoft.EntityFrameworkCore;
 using Lab8Models;
 

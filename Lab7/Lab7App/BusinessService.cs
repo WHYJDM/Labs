@@ -16,7 +16,7 @@ public class BusinessService
     /// <param name="context">The application database context.</param>
     public BusinessService(ApplicationDbContext context)
     {
-        _context = context; // через один котекст чтобы гарантированно все либо добавилось либо удалилось
+        _context = context;
     }
 
     /// <summary>

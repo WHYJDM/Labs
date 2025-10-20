@@ -1,6 +1,3 @@
-// главное место отсюда вызываются методы (WatchMaanager) и (XmlHandler)
-
-
 using Lab2Library;
 
 

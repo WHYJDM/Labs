@@ -1,6 +1,3 @@
-///// эта хреновина нужна чтобы все обьекты наследников были в одной таблице (может быть много null полей и табл станет не эффективной)
-
-
 using Lab8TPH;
 using Lab8Models;
 
@@ -33,7 +30,6 @@ using (var context = new ApplicationDbContext())
 
 using (var context = new ApplicationDbContext())
 {
-    // Query all watches
     var allWatches = context.Watches.ToList();
     Console.WriteLine("All Watches:");
     foreach (var watch in allWatches)
@@ -42,7 +38,6 @@ using (var context = new ApplicationDbContext())
         Console.WriteLine();
     }
 
-    // Query specific types
     var electronicWatches = context.ElectronicWatches.ToList();
     Console.WriteLine("Electronic Watches:");
     foreach (var watch in electronicWatches)

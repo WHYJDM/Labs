@@ -5,11 +5,9 @@ Console.WriteLine("TPC Strategy Demo");
 
 using (var context = new ApplicationDbContext())
 {
-    // Ensure database is created
     context.Database.EnsureDeleted();
     context.Database.EnsureCreated();
 
-    // Add manufacturers
     var manufacturer1 = Manufacturer.Create("Rolex", "Switzerland", false);
     var manufacturer2 = Manufacturer.Create("Casio", "Japan", true);
     context.Manufacturers.AddRange(manufacturer1, manufacturer2);
@@ -18,7 +16,6 @@ using (var context = new ApplicationDbContext())
 
 using (var context = new ApplicationDbContext())
 {
-    // Add watches
     var electronicWatch = ElectronicWatches.Create("G-Shock", "GS123", 2, 24, true);
     context.ElectronicWatches.Add(electronicWatch);
     context.SaveChanges();
@@ -42,7 +39,6 @@ using (var context = new ApplicationDbContext())
 
 using (var context = new ApplicationDbContext())
 {
-    // Query specific types
     var electronicWatches = context.ElectronicWatches.ToList();
     Console.WriteLine("Electronic Watches:");
     foreach (var watch in electronicWatches)
@@ -51,7 +47,6 @@ using (var context = new ApplicationDbContext())
         Console.WriteLine();
     }
 
-    // Note: Queries for other types have issues in this EF Core version
 }
 
 Console.WriteLine("TPC Demo completed.");

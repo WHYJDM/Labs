@@ -18,7 +18,7 @@ public class FileOperations
     /// <param name="fileName">The name of the file to write to.</param>
     public void WriteToFile(IEnumerable<Watches> items, string fileName)
     {
-        fileSemaphore.Wait(); // блокирует доступ другим потокам только 1 поток может работать
+        fileSemaphore.Wait();
         try
         {
             using var writer = new StreamWriter(fileName);
